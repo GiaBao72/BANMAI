@@ -11,23 +11,28 @@
 <body>
 
 <div class="admin-wrapper">
-  <aside class="sidebar">
+  <div class="mobile-overlay" id="mobile-overlay" onclick="toggleSidebar()"></div>
+
+  <aside class="sidebar" id="sidebar">
     <div class="brand">
-      <i class="fa-solid fa-shield-halved"></i>
-      <span>Admin Portal</span>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>Admin Portal</span>
+      </div>
+      <button class="btn-close-sidebar" onclick="toggleSidebar()">✕</button>
     </div>
 
     <nav class="nav-menu">
-      <button class="nav-item active" onclick="switchTab('dashboard')">
+      <button class="nav-item active" onclick="switchTab('dashboard', event)">
         <i class="fa-solid fa-chart-pie"></i> Tổng quan
       </button>
-      <button class="nav-item" onclick="switchTab('matrix')">
+      <button class="nav-item" onclick="switchTab('matrix', event)">
         <i class="fa-solid fa-table-list"></i> Theo dõi chi tiết
       </button>
-      <button class="nav-item" onclick="switchTab('users')">
+      <button class="nav-item" onclick="switchTab('users', event)">
         <i class="fa-solid fa-users-gear"></i> Quản lý nhân sự
       </button>
-      <button class="nav-item" onclick="switchTab('settings')">
+      <button class="nav-item" onclick="switchTab('settings', event)">
         <i class="fa-solid fa-sliders"></i> Cấu hình
       </button>
     </nav>
@@ -41,11 +46,17 @@
 
   <main class="main-content">
     <header class="top-bar">
-      <h2 id="page-title">Tổng quan hệ thống</h2>
+      <div class="top-bar-left">
+        <button class="btn-menu-toggle" onclick="toggleSidebar()">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <h2 id="page-title">Tổng quan hệ thống</h2>
+      </div>
+
       <div class="header-actions">
         <div class="date-picker-group">
-          <label>Ngày báo cáo:</label>
-          <input type="date" id="global-date" class="form-control" onchange="refreshData()">
+          <i class="fa-regular fa-calendar" style="color:#64748b"></i>
+          <input type="date" id="global-date" onchange="refreshData()">
         </div>
         <div class="admin-profile">
           <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="Admin">
@@ -58,38 +69,26 @@
       <div class="stats-grid">
         <div class="card stat-card">
           <div class="icon blue"><i class="fa-solid fa-users"></i></div>
-          <div class="info">
-            <h3>Tổng nhân sự</h3>
-            <strong id="stat-total-emp">0</strong>
-          </div>
+          <div class="info"><h3>Tổng nhân sự</h3><strong id="stat-total-emp">0</strong></div>
         </div>
         <div class="card stat-card">
           <div class="icon green"><i class="fa-solid fa-file-circle-check"></i></div>
-          <div class="info">
-            <h3>Đã nộp</h3>
-            <strong id="stat-submitted">0</strong>
-          </div>
+          <div class="info"><h3>Đã nộp</h3><strong id="stat-submitted">0</strong></div>
         </div>
         <div class="card stat-card">
           <div class="icon red"><i class="fa-solid fa-triangle-exclamation"></i></div>
-          <div class="info">
-            <h3>Thiếu / Chưa nộp</h3>
-            <strong id="stat-missing">0</strong>
-          </div>
+          <div class="info"><h3>Thiếu / Chưa nộp</h3><strong id="stat-missing">0</strong></div>
         </div>
         <div class="card stat-card">
           <div class="icon orange"><i class="fa-solid fa-chart-line"></i></div>
-          <div class="info">
-            <h3>Tỷ lệ hoàn thành</h3>
-            <strong id="stat-rate">0%</strong>
-          </div>
+          <div class="info"><h3>Tỷ lệ hoàn thành</h3><strong id="stat-rate">0%</strong></div>
         </div>
       </div>
 
       <div class="card table-wrapper">
         <div class="card-header">
           <h3>Tiến độ theo bộ phận</h3>
-          <button class="btn-outline"><i class="fa-solid fa-download"></i> Xuất báo cáo</button>
+          <button class="btn-outline"><i class="fa-solid fa-download"></i> Xuất Excel</button>
         </div>
         <table class="data-table">
           <thead>
@@ -97,20 +96,19 @@
             <th>Bộ phận</th>
             <th class="text-center">Nhân sự</th>
             <th class="text-center">Đã nộp</th>
-            <th>Thanh tiến độ</th>
+            <th>Tiến độ</th>
             <th class="text-center">Trạng thái</th>
           </tr>
           </thead>
-          <tbody id="dept-table-body">
-          </tbody>
+          <tbody id="dept-table-body"></tbody>
         </table>
       </div>
     </section>
 
-    <section id="tab-matrix" class="tab-pane">
+    <section id="tab-matrix" class="tab-pane hidden">
       <div class="filter-toolbar card">
         <div class="group">
-          <label style="align-self:center; font-weight:500; margin-right:10px;">Lọc bộ phận:</label>
+          <label style="align-self:center; font-weight:500;">Lọc:</label>
           <select id="matrix-dept-filter" class="form-control" onchange="renderMatrix()">
             <option value="all">Tất cả bộ phận</option>
             <option value="Kho vận">Kho vận</option>
@@ -118,13 +116,14 @@
             <option value="Kỹ thuật">Kỹ thuật</option>
           </select>
         </div>
-        <button class="btn-primary" onclick="remindAllMissing()"><i class="fa-solid fa-bell"></i> Nhắc nhở tất cả</button>
+        <button class="btn-primary" onclick="remindAllMissing()"><i class="fa-solid fa-bell"></i> Nhắc tất cả</button>
       </div>
+
       <div class="status-legend">
         <div class="legend-item"><span class="dot green"></span> <strong>Đạt</strong> (Đã duyệt)</div>
         <div class="legend-item"><span class="dot red"></span> <strong>Chưa đạt</strong> (Cần sửa)</div>
-        <div class="legend-item"><span class="dot white"></span> <strong>Chờ duyệt</strong> (Đã nộp, đợi Reviewer)</div>
-        <div class="legend-item"><span class="dot gray"></span> <strong>Chưa hoàn thành</strong> (Chưa nộp)</div>
+        <div class="legend-item"><span class="dot white"></span> <strong>Chờ duyệt</strong> (Đã nộp)</div>
+        <div class="legend-item"><span class="dot gray"></span> <strong>Chưa nộp</strong></div>
       </div>
 
       <div class="card table-wrapper">
@@ -138,12 +137,12 @@
             <th>Hành động</th>
           </tr>
           </thead>
-          <tbody id="matrix-table-body">
-          </tbody>
+          <tbody id="matrix-table-body"></tbody>
         </table>
       </div>
     </section>
-    <section id="tab-users" class="tab-pane">
+
+    <section id="tab-users" class="tab-pane hidden">
       <div class="card table-wrapper">
         <div class="card-header">
           <h3>Danh sách nhân viên</h3>
@@ -159,13 +158,12 @@
             <th>Thao tác</th>
           </tr>
           </thead>
-          <tbody id="user-list-body">
-          </tbody>
+          <tbody id="user-list-body"></tbody>
         </table>
       </div>
     </section>
 
-    <section id="tab-settings" class="tab-pane">
+    <section id="tab-settings" class="tab-pane hidden">
       <div class="card" style="padding: 20px;">
         <h3>Cấu hình hệ thống</h3>
         <p style="color:#666; margin-top:10px;">Tính năng đang phát triển...</p>
@@ -178,30 +176,13 @@
   <div class="modal-box">
     <div class="modal-header">
       <h3>Thông tin nhân sự</h3>
-      <button onclick="closeUserModal()">✕</button>
+      <button onclick="closeUserModal()" style="border:none;background:none;font-size:1.2rem;">✕</button>
     </div>
     <div class="modal-body">
       <form id="user-form">
-        <div class="form-group">
-          <label>Họ tên</label>
-          <input type="text" class="form-control" required placeholder="Nguyễn Văn A">
-        </div>
-        <div class="form-group">
-          <label>Bộ phận</label>
-          <select class="form-control">
-            <option value="Kho vận">Kho vận</option>
-            <option value="Văn phòng">Văn phòng</option>
-            <option value="Kỹ thuật">Kỹ thuật</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Vai trò</label>
-          <select class="form-control">
-            <option value="Employee">Nhân viên</option>
-            <option value="Manager">Quản lý (Reviewer)</option>
-            <option value="Admin">Admin</option>
-          </select>
-        </div>
+        <div class="form-group"><label>Họ tên</label><input type="text" class="form-control" placeholder="Nguyễn Văn A"></div>
+        <div class="form-group"><label>Bộ phận</label><select class="form-control"><option>Kho vận</option><option>Văn phòng</option></select></div>
+        <div class="form-group"><label>Vai trò</label><select class="form-control"><option>Nhân viên</option><option>Admin</option></select></div>
       </form>
     </div>
     <div class="modal-footer">
