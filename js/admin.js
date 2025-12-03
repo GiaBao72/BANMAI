@@ -248,3 +248,25 @@ function remindUser(name) {
     btn.classList.add('btn-primary'); // Đổi màu nút
   }, 1000);
 }
+// --- MOBILE SIDEBAR TOGGLE ---
+function toggleSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('mobile-overlay');
+
+  sidebar.classList.toggle('open');
+  if (sidebar.classList.contains('open')) {
+    overlay.classList.add('show');
+  } else {
+    overlay.classList.remove('show');
+  }
+}
+
+// Tự động đóng sidebar khi chuyển tab trên mobile
+const originalSwitchTab = switchTab;
+switchTab = function(tabId) {
+  originalSwitchTab(tabId);
+  // Đóng menu nếu đang ở màn hình nhỏ
+  if (window.innerWidth < 1024) {
+    toggleSidebar();
+  }
+}

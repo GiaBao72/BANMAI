@@ -115,15 +115,16 @@ const renderHome = () => {
       icon = '⚠️';
     }
 
+// CẬP NHẬT HTML GRID CHO TASK ITEM
     li.innerHTML = `
-            <div class="task-info-group">
-                <div class="task-name">${task.name}</div>
-                <div class="task-time">🕒 ${task.time}</div>
-            </div>
-            <div class="status-badge ${badgeClass}">
-                ${icon} ${statusLabel}
-            </div>
-        `;
+        <div class="task-header">
+            <div class="task-name">${task.name}</div>
+            <div class="task-time">🕒 ${task.time}</div>
+        </div>
+        <div class="status-badge ${badgeClass}">
+            ${icon} ${statusLabel}
+        </div>
+    `;
 
     if (task.status === 'open' || task.status === 'rejected') {
       li.style.cursor = 'pointer';

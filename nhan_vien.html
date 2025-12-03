@@ -11,54 +11,64 @@
 
 <main id="scr-home" class="screen active">
   <header class="app-header">
-    <div class="user-profile">
-      <h2 class="greeting" style="font-size: 1.1rem; margin-bottom: 2px;">Xin chào,</h2>
-      <span class="fw-bold" id="user-name" style="font-size: 1.2rem;">...</span>
-      <p class="location-label" style="font-size: 0.85rem; color: #666; margin-top: 4px;">📍 <span id="user-area">...</span></p>
-    </div>
-    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 8px;">
-      <a href="index.html" class="btn-soft">🏠 Trang chủ</a>
-      <time id="date-display" class="fw-bold" style="font-size: 0.85rem; color: var(--primary-color);">...</time>
+    <div class="container-limit header-inner">
+      <div class="user-profile">
+        <h2 class="greeting" style="font-size: 1.1rem; margin-bottom: 2px;">Xin chào,</h2>
+        <span class="fw-bold" id="user-name" style="font-size: 1.25rem;">...</span>
+        <p class="location-label" style="font-size: 0.9rem; color: #6b7280; margin-top: 4px;">📍 <span id="user-area">...</span></p>
+      </div>
+      <div style="text-align: right;">
+        <a href="index.html" class="btn-soft">🏠 Trang chủ</a>
+        <div style="margin-top: 8px;">
+          <time id="date-display" class="fw-bold" style="font-size: 0.9rem; color: var(--primary-color);">...</time>
+        </div>
+      </div>
     </div>
   </header>
 
-  <div class="content-body">
-    <section id="notification-banner" class="banner hidden" role="alert" style="background:#fff3cd; color:#856404; padding:12px; border-radius:8px; margin-bottom:16px;">
-      <p id="banner-message">Thông báo</p>
+  <div class="container-limit content-body">
+    <section id="notification-banner" class="banner hidden" role="alert" style="background:#fff7ed; color:#9a3412; padding:16px; border-radius:12px; margin-bottom:24px; border: 1px solid #ffedd5; display:flex; align-items:center; gap:10px;">
+      <span style="font-size: 1.2rem;">🔔</span> <p id="banner-message" style="font-weight: 500;">Thông báo</p>
     </section>
 
     <section class="task-list-container">
-      <div class="list-header" style="margin-bottom: 12px; font-weight: 600;">Danh sách công việc</div>
-      <ul id="task-list" class="task-list" style="list-style:none;"></ul>
+      <div class="list-header" style="margin-bottom: 16px; font-weight: 700; font-size: 1.1rem; color: #374151;">Danh sách công việc</div>
+      <ul id="task-list" class="task-list" style="list-style:none;">
+      </ul>
     </section>
   </div>
 </main>
 
 <main id="scr-detail" class="screen hidden">
-  <nav class="nav-bar">
-    <button id="btn-back" class="btn-soft">‹ Quay lại</button>
-    <h1 id="detail-title" class="screen-title" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;">Chi tiết</h1>
-    <div class="timer">⏱ <time id="countdown">15:00</time></div>
+  <nav class="app-header">
+    <div class="container-limit header-inner">
+      <button id="btn-back" class="btn-soft">‹ Quay lại</button>
+      <h1 id="detail-title" class="screen-title" style="font-size: 1.1rem; font-weight: 700;">Chi tiết</h1>
+      <div class="timer" style="background:#fee2e2; color:#b91c1c; padding:6px 10px; border-radius:8px; font-weight:600;">⏱ <time id="countdown">15:00</time></div>
+    </div>
   </nav>
 
-  <div class="content-body">
-    <section class="instruction-panel" style="background: #e0f2fe; padding: 12px; border-radius: 8px; margin-bottom: 20px; color: #0369a1; font-size: 0.9rem;">
-      <p>📸 <strong>Yêu cầu:</strong> Vui lòng chụp ảnh minh chứng rõ nét, đủ ánh sáng.</p>
+  <div class="container-limit content-body">
+    <section class="instruction-panel" style="background: #eff6ff; padding: 16px; border-radius: 12px; margin-bottom: 24px; color: #1e40af; border: 1px solid #dbeafe;">
+      <p>📸 <strong>Hướng dẫn:</strong> Vui lòng chụp ảnh minh chứng rõ nét, đảm bảo đủ ánh sáng và góc chụp bao quát.</p>
     </section>
+
     <section class="photo-upload-list" id="photo-slots"></section>
   </div>
 
   <footer class="footer-actions">
-    <button id="btn-submit" class="btn-primary" disabled>Gửi báo cáo</button>
-    <p id="submit-msg" class="error-text hidden">Vui lòng chụp đủ ảnh</p>
+    <div class="footer-inner">
+      <button id="btn-submit" class="btn-primary" disabled>Gửi báo cáo</button>
+      <p id="submit-msg" class="error-text hidden">Vui lòng chụp đủ ảnh</p>
+    </div>
   </footer>
 </main>
 
 <div id="scr-success" class="modal-overlay hidden">
   <div class="modal-content">
-    <span class="icon-success">🎉</span>
-    <h2 style="margin-bottom: 8px;">Thành công!</h2>
-    <p style="color: #666; margin-bottom: 20px;">Báo cáo đã được gửi đi.</p>
+    <span style="font-size: 3.5rem; display: block; margin-bottom: 10px;">🎉</span>
+    <h2 style="margin-bottom: 10px; color: #111;">Thành công!</h2>
+    <p style="color: #666; margin-bottom: 24px; line-height: 1.5;">Báo cáo của bạn đã được gửi lên hệ thống và đang chờ duyệt.</p>
     <button id="btn-home" class="btn-primary">Về trang chủ</button>
   </div>
 </div>
