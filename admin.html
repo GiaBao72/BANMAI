@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work Report Admin Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/admin.css">
+</head>
+<body>
+
+<div class="dashboard-layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <h2>Admin Portal</h2>
+      <button class="close-sidebar-btn mobile-only" onclick="toggleSidebar()">✕</button>
+    </div>
+
+    <nav class="nav-menu">
+    </nav>
+
+    <div style="margin-top: auto; padding: 20px; border-top: 1px solid var(--border);">
+      <a href="index.html" class="nav-item" style="color: var(--danger);">
+        <span class="icon">🚪</span> Đăng xuất
+      </a>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <header class="top-bar mobile-only">
+      <button onclick="toggleSidebar()">☰ Menu</button>
+      <span>Bảng theo dõi</span>
+    </header>
+
+    <section id="scr-dashboard" class="page-section active">
+      <div class="filter-bar">
+        <h1 class="page-title">Bảng theo dõi tiến độ</h1>
+        <div class="filter-controls">
+          <input type="date" id="date-filter" class="form-control" value="2023-10-25">
+          <select class="form-control">
+            <option>Tất cả khu vực</option>
+            <option>Khu A</option>
+            <option>Khu B</option>
+          </select>
+          <button class="btn btn-outline" onclick="exportExcel()">⬇ Xuất Excel</button>
+        </div>
+      </div>
+
+      <div class="status-legend">
+        <div class="legend-item"><span class="dot approved"></span> Đạt</div>
+        <div class="legend-item"><span class="dot rejected"></span> Chưa đạt</div>
+        <div class="legend-item"><span class="dot pending">(x)</span> Chờ duyệt</div>
+        <div class="legend-item"><span class="dot empty"></span> Chưa làm</div>
+      </div>
+
+      <div class="matrix-container">
+        <table class="matrix-table" id="matrix-table">
+        </table>
+      </div>
+    </section>
+
+    <section id="scr-users" class="page-section hidden">
+      <div class="filter-bar">
+        <h1 class="page-title">Quản lý nhân sự</h1>
+        <button class="btn btn-primary" onclick="openUserModal()">+ Thêm nhân sự</button>
+      </div>
+      <div class="table-responsive">
+        <table class="standard-table">
+          <thead>
+          <tr>
+            <th>Họ tên</th>
+            <th>Vai trò</th>
+            <th>Khu vực phụ trách</th>
+            <th>Thao tác</th>
+          </tr>
+          </thead>
+          <tbody id="user-list-body">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<dialog id="detail-modal" class="modal">
+  <div class="modal-box">
+    <header class="modal-header">
+      <h3 id="modal-title">Vệ sinh kệ - Khu A</h3>
+      <span id="modal-badge" class="badge">Đạt</span>
+    </header>
+    <div class="modal-body">
+      <p class="meta-info">👤 <span id="modal-emp">Nguyễn Văn A</span> | 🕒 <span id="modal-time">10:00</span></p>
+
+      <div class="gallery-grid" id="modal-gallery">
+      </div>
+
+      <div id="modal-note-area" class="alert-box error hidden">
+        <strong>Lý do từ chối:</strong> <span id="modal-note-content">...</span>
+      </div>
+    </div>
+    <footer class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal()">Đóng</button>
+    </footer>
+  </div>
+</dialog>
+
+<script src="js/admin.js"></script>
+</body>
+</html>

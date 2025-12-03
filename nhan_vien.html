@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cổng Nhân Viên</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/nhan_vien.css">
+</head>
+<body>
+
+<main id="scr-home" class="screen active">
+  <header class="app-header">
+    <div class="user-profile">
+      <h2 class="greeting">Xin chào, <span class="fw-bold" id="user-name">...</span></h2>
+      <p class="location-label">📍 <span id="user-area">...</span></p>
+    </div>
+    <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
+      <a href="index.html" class="btn-home-link" aria-label="Về trang chủ">
+        🏠 Trang chủ
+      </a>
+    <div class="current-date">
+      <time id="date-display" class="fw-bold" style="font-size: 0.9rem; color: var(--primary-color);">...</time>
+    </div>
+  </header>
+
+  <div class="content-body">
+    <section id="notification-banner" class="banner hidden" role="alert">
+      <p id="banner-message">Thông báo</p>
+    </section>
+
+    <section class="task-list-container">
+      <div class="list-header">
+        <span>Danh sách công việc</span>
+      </div>
+      <ul id="task-list" class="task-list">
+      </ul>
+    </section>
+  </div>
+</main>
+
+<main id="scr-detail" class="screen hidden">
+  <nav class="nav-bar">
+    <button id="btn-back" class="btn-icon" aria-label="Quay lại">
+      <span style="font-size:1.2rem">‹</span> Quay lại
+    </button>
+    <h1 id="detail-title" class="screen-title" style="font-size:1rem; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:150px;">Bước 1</h1>
+    <div class="timer">
+      ⏱ <time id="countdown">15:00</time>
+    </div>
+  </nav>
+
+  <div class="content-body">
+    <section class="instruction-panel">
+      <p>📸 Vui lòng chụp ảnh minh chứng rõ nét cho các hạng mục bên dưới.</p>
+    </section>
+
+    <section class="photo-upload-list" id="photo-slots">
+    </section>
+  </div>
+
+  <footer class="footer-actions">
+    <button id="btn-submit" class="btn-primary" disabled>
+      Gửi báo cáo
+    </button>
+    <p id="submit-msg" class="error-text hidden" style="text-align:center; margin-top:8px; font-size:0.85rem; color:var(--danger-color)">
+      Vui lòng chụp đủ ảnh
+    </p>
+  </footer>
+</main>
+
+<div id="scr-success" class="modal-overlay hidden" role="dialog">
+  <div class="modal-content">
+    <div class="icon-success">🎉</div>
+    <h2 style="margin-bottom:10px;">Thành công!</h2>
+    <p style="color:#666; margin-bottom:20px;">Báo cáo đã được gửi đi. Vui lòng chờ duyệt.</p>
+    <button id="btn-home" class="btn-primary">Về trang chủ</button>
+  </div>
+</div>
+
+<script src="js/nhan_vien.js"></script>
+</body>
+</html>

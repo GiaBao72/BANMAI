@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Review Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="css/kiem_duyet.css">
+</head>
+<body>
+
+<main id="scr-dashboard" class="screen active">
+  <header class="dashboard-header">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+      <h1>Phê duyệt báo cáo</h1>
+      <a href="index.html" class="btn btn-text" style="text-decoration: none;">🏠 Trang chủ</a>
+    </div>
+    <div class="filter-tabs" role="tablist">
+      <button class="tab-btn active" data-tab="pending" onclick="switchTab('pending')">
+        Chờ duyệt <span class="badge" id="badge-count">0</span>
+      </button>
+      <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
+        Lịch sử duyệt
+      </button>
+    </div>
+  </header>
+
+  <section id="submission-feed" class="feed-container">
+  </section>
+
+  <template id="empty-state-tpl">
+    <div class="empty-state">
+      <div class="icon">📭</div>
+      <p>Hiện tại không có báo cáo nào cần duyệt.</p>
+    </div>
+  </template>
+</main>
+
+<section id="scr-detail" class="screen hidden detail-view">
+  <div class="image-viewer-container">
+    <img id="detail-image" src="" alt="Evidence Photo">
+
+    <div class="overlay-info">
+      <p>📍 <span id="detail-loc">Khu vực A</span></p>
+      <p>🕒 <span id="detail-time">10:30 20/10/2023</span></p>
+    </div>
+
+    <div class="viewer-controls">
+      <button class="ctrl-btn" onclick="transformImage('rotate')">↻ Xoay</button>
+      <button class="ctrl-btn" onclick="transformImage('zoom-in')">+ Zoom</button>
+      <button class="ctrl-btn" onclick="transformImage('zoom-out')">- Zoom</button>
+      <button class="ctrl-btn close-btn" onclick="closeDetail()">✕ Đóng</button>
+    </div>
+  </div>
+
+  <footer class="decision-panel">
+    <div class="employee-summary">
+      <strong id="detail-emp-name">Nguyễn Văn A</strong>
+      <span id="detail-task-name">Vệ sinh kệ hàng</span>
+    </div>
+    <div class="button-group">
+      <button class="btn btn-outline-danger" onclick="openRejectModal()">
+        ✕ Chưa đạt
+      </button>
+      <button class="btn btn-solid-success" onclick="quickApprove(currentReviewId)">
+        ✓ Duyệt ngay
+      </button>
+    </div>
+  </footer>
+</section>
+
+<dialog id="scr-reject-modal" class="modal-dialog">
+  <form method="dialog" id="reject-form">
+    <header class="modal-header">
+      <h3>Xác nhận từ chối</h3>
+    </header>
+    <div class="modal-body">
+                <textarea
+                  id="reject-reason"
+                  placeholder="Ghi chú lý do vì sao chưa đạt (Ví dụ: Ảnh mờ, góc chụp sai...)"
+                  rows="4"
+                  minlength="5"
+                  required></textarea>
+      <p class="error-text hidden" id="modal-error">Vui lòng nhập lý do (tối thiểu 5 ký tự).</p>
+    </div>
+    <footer class="modal-actions">
+      <button type="button" class="btn btn-text" onclick="closeRejectModal()">Hủy bỏ</button>
+      <button type="submit" class="btn btn-solid-danger">Gửi phản hồi</button>
+    </footer>
+  </form>
+</dialog>
+
+<script src="js/kiem_duyet.js"></script>
+</body>
+</html>
