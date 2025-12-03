@@ -110,20 +110,21 @@
     <section id="tab-matrix" class="tab-pane">
       <div class="filter-toolbar card">
         <div class="group">
+          <label style="align-self:center; font-weight:500; margin-right:10px;">Lọc bộ phận:</label>
           <select id="matrix-dept-filter" class="form-control" onchange="renderMatrix()">
             <option value="all">Tất cả bộ phận</option>
             <option value="Kho vận">Kho vận</option>
             <option value="Văn phòng">Văn phòng</option>
             <option value="Kỹ thuật">Kỹ thuật</option>
           </select>
-          <select id="matrix-status-filter" class="form-control" onchange="renderMatrix()">
-            <option value="all">Tất cả trạng thái</option>
-            <option value="missing">🔴 Chưa nộp</option>
-            <option value="late">🟠 Nộp muộn</option>
-            <option value="on_time">🟢 Đúng giờ</option>
-          </select>
         </div>
         <button class="btn-primary" onclick="remindAllMissing()"><i class="fa-solid fa-bell"></i> Nhắc nhở tất cả</button>
+      </div>
+      <div class="status-legend">
+        <div class="legend-item"><span class="dot green"></span> <strong>Đạt</strong> (Đã duyệt)</div>
+        <div class="legend-item"><span class="dot red"></span> <strong>Chưa đạt</strong> (Cần sửa)</div>
+        <div class="legend-item"><span class="dot white"></span> <strong>Chờ duyệt</strong> (Đã nộp, đợi Reviewer)</div>
+        <div class="legend-item"><span class="dot gray"></span> <strong>Chưa hoàn thành</strong> (Chưa nộp)</div>
       </div>
 
       <div class="card table-wrapper">
@@ -132,7 +133,6 @@
           <tr>
             <th>Nhân viên</th>
             <th>Bộ phận</th>
-            <th>Giờ vào ca</th>
             <th>Giờ nộp</th>
             <th>Trạng thái</th>
             <th>Hành động</th>
@@ -143,7 +143,6 @@
         </table>
       </div>
     </section>
-
     <section id="tab-users" class="tab-pane">
       <div class="card table-wrapper">
         <div class="card-header">

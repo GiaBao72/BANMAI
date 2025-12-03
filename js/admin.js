@@ -120,50 +120,61 @@ function renderDashboard() {
   });
 }
 
+// Hàm vẽ bảng Ma trận / Báo cáo chi tiết
 function renderMatrix() {
   const selectedDate = document.getElementById('global-date').value;
   const filterDept = document.getElementById('matrix-dept-filter').value;
-  const filterStatus = document.getElementById('matrix-status-filter').value;
   const tbody = document.getElementById('matrix-table-body');
   tbody.innerHTML = '';
 
-  // Loop qua TẤT CẢ nhân viên để xem ai thiếu
+  // Loop qua tất cả nhân viên
   users.forEach(user => {
+    // Lọc bộ phận
     if (filterDept !== 'all' && user.dept !== filterDept) return;
 
-    // Tìm report của user này trong ngày đang chọn
+    // Tìm báo cáo của user trong ngày chọn
     const userReport = reports.find(r => r.date === selectedDate && userMap[r.emp] === user.id);
 
-    // Xác định trạng thái
-    let statusKey = 'missing';
-    if (userReport) {
-      // Giả sử nộp sau 09:00 là muộn (logic demo)
-      const cutoffTime = "09:00";
-      statusKey = userReport.time > cutoffTime ? 'late' : 'on_time';
+    // XÁC ĐỊNH TRẠNG THÁI HIỂN THỊ
+    let statusHtml = '';
+    let actionHtml = '';
+
+    if (!userReport) {
+      // CASE 4: Chưa hoàn thành (Không có tick, rỗng)
+      // Hiển thị dấu gạch ngang hoặc để trống
+      statusHtml = `<span class="status-missing">-- Chưa nộp --</span>`;
+      actionHtml = `<button class="btn-sm btn-outline" onclick="remindUser('${user.name}')"><i class="fa-solid fa-bell"></i> Nhắc</button>`;
+    } else {
+      // Có báo cáo, kiểm tra trạng thái duyệt
+      if (userReport.status === 'approved') {
+        // CASE 1: Đạt (Xanh)
+        statusHtml = `<div class="status-approved"><i class="fa-solid fa-check"></i> Đạt</div>`;
+        actionHtml = `<span class="text-muted">-</span>`;
+      }
+      else if (userReport.status === 'rejected') {
+        // CASE 2: Chưa đạt (Đỏ)
+        statusHtml = `<div class="status-rejected"><i class="fa-solid fa-xmark"></i> Chưa đạt</div>`;
+        actionHtml = `<button class="btn-sm btn-outline" onclick="viewDetail(${userReport.id})">Xem lỗi</button>`;
+      }
+      else { // pending
+        // CASE 3: Chưa duyệt (Không màu/Trắng)
+        statusHtml = `<div class="status-pending"><i class="fa-regular fa-clock"></i> Chờ duyệt</div>`;
+        actionHtml = `<button class="btn-sm btn-primary" onclick="quickReview(${userReport.id})">Duyệt ngay</button>`;
+      }
     }
 
-    if (filterStatus !== 'all' && statusKey !== filterStatus) return;
-
-    let badgeHtml = '';
-    if(statusKey === 'missing') badgeHtml = '<span class="badge badge-danger">🔴 Chưa nộp</span>';
-    else if(statusKey === 'late') badgeHtml = '<span class="badge badge-warning">🟠 Muộn</span>';
-    else badgeHtml = '<span class="badge badge-success">🟢 Đúng giờ</span>';
-
-    const timeText = userReport ? userReport.time : '--:--';
+    const timeText = userReport ? userReport.time : '';
 
     const tr = document.createElement('tr');
     tr.innerHTML = `
             <td>
                 <strong>${user.name}</strong><br>
-                <span style="font-size:12px; color:#666">ID: ${user.id}</span>
+                <span style="font-size:12px; color:#999">ID: ${user.id}</span>
             </td>
             <td>${user.dept}</td>
-            <td>08:00</td>
             <td>${timeText}</td>
-            <td>${badgeHtml}</td>
-            <td>
-                ${statusKey === 'missing' ? `<button class="btn-sm btn-outline" onclick="alert('Đã gửi nhắc nhở đến ${user.name}')"><i class="fa-solid fa-bell"></i> Nhắc</button>` : '<span style="color:#ccc">-</span>'}
-            </td>
+            <td>${statusHtml}</td>
+            <td>${actionHtml}</td>
         `;
     tbody.appendChild(tr);
   });
@@ -195,3 +206,45 @@ function renderUserList() {
 function openUserModal() { document.getElementById('user-modal').classList.remove('hidden'); }
 function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
 function saveUser() { alert("Đã lưu (Demo)"); closeUserModal(); }
+
+// ... (Giữ nguyên toàn bộ code cũ ở trên) ...
+
+// --- 5. CÁC HÀM XỬ LÝ SỰ KIỆN (ACTIONS) ---
+
+// Xử lý nút "Duyệt ngay"
+function quickReview(id) {
+  const item = reports.find(r => r.id === id);
+  if (item) {
+    if(confirm(`Xác nhận duyệt nhanh báo cáo này?`)) {
+      item.status = 'approved'; // Chuyển trạng thái sang Đạt
+      refreshData(); // Vẽ lại giao diện để thấy màu xanh
+    }
+  }
+}
+
+// Xử lý nút "Xem lỗi" (đối với báo cáo chưa đạt)
+function viewDetail(id) {
+  const item = reports.find(r => r.id === id);
+  if (item) {
+    // Trong thực tế sẽ mở Modal chi tiết, ở đây dùng Alert để demo
+    alert(`CHI TIẾT LỖI (Demo)\n----------------\nNhân viên: ${item.emp}\nThời gian: ${item.time}\n\n⚠️ LÝ DO TỪ CHỐI:\n- Ảnh chụp bị mờ.\n- Góc chụp chưa bao quát hết khu vực.\n\n(Hệ thống đã gửi yêu cầu chụp lại cho nhân viên)`);
+  }
+}
+
+// Xử lý nút "Nhắc" (đối với người chưa nộp)
+function remindUser(name) {
+  // Giả lập gửi thông báo
+  const btn = event.target; // Lấy nút đang bấm
+  const originalText = btn.innerHTML;
+
+  // Hiệu ứng loading giả
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Đang gửi...`;
+  btn.disabled = true;
+
+  setTimeout(() => {
+    alert(`Đã gửi tin nhắn nhắc nhở đến Zalo của: ${name}`);
+    btn.innerHTML = `<i class="fa-solid fa-check"></i> Đã nhắc`;
+    btn.classList.remove('btn-outline');
+    btn.classList.add('btn-primary'); // Đổi màu nút
+  }, 1000);
+}
