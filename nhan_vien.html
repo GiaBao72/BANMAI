@@ -16,11 +16,8 @@
       <p class="location-label">📍 <span id="user-area">...</span></p>
     </div>
     <div style="display: flex; flex-direction: column; align-items: flex-end; gap: 5px;">
-      <a href="index.html" class="btn-home-link" aria-label="Về trang chủ">
-        🏠 Trang chủ
-      </a>
-    <div class="current-date">
-      <time id="date-display" class="fw-bold" style="font-size: 0.9rem; color: var(--primary-color);">...</time>
+      <a href="index.html" class="btn-home-link">🏠 Trang chủ</a>
+      <time id="date-display" class="fw-bold" style="font-size: 0.85rem; color: var(--primary-color);">...</time>
     </div>
   </header>
 
@@ -30,54 +27,40 @@
     </section>
 
     <section class="task-list-container">
-      <div class="list-header">
-        <span>Danh sách công việc</span>
-      </div>
-      <ul id="task-list" class="task-list">
-      </ul>
+      <div class="list-header"><span>Danh sách công việc</span></div>
+      <ul id="task-list" class="task-list"></ul>
     </section>
   </div>
 </main>
 
 <main id="scr-detail" class="screen hidden">
   <nav class="nav-bar">
-    <button id="btn-back" class="btn-icon" aria-label="Quay lại">
-      <span style="font-size:1.2rem">‹</span> Quay lại
-    </button>
-    <h1 id="detail-title" class="screen-title" style="font-size:1rem; text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:150px;">Bước 1</h1>
-    <div class="timer">
-      ⏱ <time id="countdown">15:00</time>
-    </div>
+    <button id="btn-back" class="btn-icon">‹ Quay lại</button>
+    <h1 id="detail-title" class="screen-title">Chi tiết</h1>
+    <div class="timer">⏱ <time id="countdown">15:00</time></div>
   </nav>
 
   <div class="content-body">
     <section class="instruction-panel">
-      <p>📸 Vui lòng chụp ảnh minh chứng rõ nét cho các hạng mục bên dưới.</p>
+      <p>📸 Vui lòng chụp ảnh minh chứng rõ nét.</p>
     </section>
-
-    <section class="photo-upload-list" id="photo-slots">
-    </section>
+    <section class="photo-upload-list" id="photo-slots"></section>
   </div>
 
   <footer class="footer-actions">
-    <button id="btn-submit" class="btn-primary" disabled>
-      Gửi báo cáo
-    </button>
-    <p id="submit-msg" class="error-text hidden" style="text-align:center; margin-top:8px; font-size:0.85rem; color:var(--danger-color)">
-      Vui lòng chụp đủ ảnh
-    </p>
+    <button id="btn-submit" class="btn-primary" disabled>Gửi báo cáo</button>
+    <p id="submit-msg" class="error-text hidden">Vui lòng chụp đủ ảnh</p>
   </footer>
 </main>
 
-<div id="scr-success" class="modal-overlay hidden" role="dialog">
+<div id="scr-success" class="modal-overlay hidden">
   <div class="modal-content">
     <div class="icon-success">🎉</div>
-    <h2 style="margin-bottom:10px;">Thành công!</h2>
-    <p style="color:#666; margin-bottom:20px;">Báo cáo đã được gửi đi. Vui lòng chờ duyệt.</p>
+    <h2>Thành công!</h2>
+    <p>Báo cáo đã được gửi đi.</p>
     <button id="btn-home" class="btn-primary">Về trang chủ</button>
   </div>
 </div>
-
 <script src="js/nhan_vien.js"></script>
 </body>
 </html>

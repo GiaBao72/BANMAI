@@ -3,92 +3,150 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Review Dashboard</title>
+  <title>Reviewer Portal - Work Report App</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" type="text/css" href="css/kiem_duyet.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/kiem_duyet.css">
 </head>
 <body>
 
-<main id="scr-dashboard" class="screen active">
-  <header class="dashboard-header">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
-      <h1>Phê duyệt báo cáo</h1>
-      <a href="index.html" class="btn btn-text" style="text-decoration: none;">🏠 Trang chủ</a>
+<div class="app-wrapper">
+  <aside class="sidebar">
+    <div class="brand">
+      <i class="fa-solid fa-clipboard-check"></i>
+      <span>Reviewer Portal</span>
     </div>
-    <div class="filter-tabs" role="tablist">
-      <button class="tab-btn active" data-tab="pending" onclick="switchTab('pending')">
-        Chờ duyệt <span class="badge" id="badge-count">0</span>
+
+    <nav class="nav-menu">
+      <button class="nav-item active" onclick="switchTab('dashboard', event)">
+        <i class="fa-solid fa-chart-pie"></i> Tổng quan
       </button>
-      <button class="tab-btn" data-tab="history" onclick="switchTab('history')">
-        Lịch sử duyệt
+      <button class="nav-item" onclick="switchTab('approval', event)">
+        <i class="fa-solid fa-list-check"></i> Duyệt báo cáo
       </button>
+      <button class="nav-item" onclick="switchTab('history', event)">
+        <i class="fa-solid fa-clock-rotate-left"></i> Lịch sử duyệt
+      </button>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="index.html" class="btn-logout">
+        <i class="fa-solid fa-house"></i> Về trang chủ
+      </a>
     </div>
-  </header>
+  </aside>
 
-  <section id="submission-feed" class="feed-container">
-  </section>
+  <main class="main-content">
+    <header class="top-bar">
+      <h2 id="page-title">Tổng quan công việc</h2>
+      <div class="header-actions">
+        <div class="admin-profile">
+          <img src="https://ui-avatars.com/api/?name=Reviewer&background=10b981&color=fff" alt="Reviewer">
+          <span>Cán bộ Kiểm duyệt</span>
+        </div>
+      </div>
+    </header>
 
-  <template id="empty-state-tpl">
-    <div class="empty-state">
-      <div class="icon">📭</div>
-      <p>Hiện tại không có báo cáo nào cần duyệt.</p>
+    <section id="tab-dashboard" class="tab-pane active">
+      <div class="stats-grid">
+        <div class="card stat-card">
+          <div class="icon orange"><i class="fa-solid fa-hourglass-half"></i></div>
+          <div class="info">
+            <h3>Cần duyệt gấp</h3>
+            <strong id="stat-pending">0</strong>
+          </div>
+        </div>
+        <div class="card stat-card">
+          <div class="icon green"><i class="fa-solid fa-check-double"></i></div>
+          <div class="info">
+            <h3>Đã duyệt hôm nay</h3>
+            <strong id="stat-approved">0</strong>
+          </div>
+        </div>
+        <div class="card stat-card">
+          <div class="icon blue"><i class="fa-solid fa-list"></i></div>
+          <div class="info">
+            <h3>Tổng báo cáo</h3>
+            <strong id="stat-total">0</strong>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-approval" class="tab-pane hidden">
+      <div class="filter-toolbar card">
+        <div class="group">
+          <label style="align-self:center; font-weight:500; margin-right:10px;">Lọc:</label>
+          <input type="date" id="filter-date" class="form-control" onchange="renderApprovalTable()">
+          <select id="filter-dept" class="form-control" onchange="renderApprovalTable()">
+            <option value="all">Tất cả bộ phận</option>
+            <option value="Kho vận">Kho vận</option>
+            <option value="Văn phòng">Văn phòng</option>
+            <option value="Kỹ thuật">Kỹ thuật</option>
+          </select>
+        </div>
+        <button class="btn-primary" onclick="approveAll()"><i class="fa-solid fa-check-to-slot"></i> Duyệt tất cả</button>
+      </div>
+
+      <div class="card table-wrapper">
+        <div class="card-header">
+          <h3>Danh sách cần xử lý</h3>
+        </div>
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>Nhân viên</th>
+            <th>Bộ phận</th>
+            <th>Hạng mục công việc</th>
+            <th>Thời gian</th>
+            <th>Trạng thái</th>
+            <th class="text-center">Thao tác</th>
+          </tr>
+          </thead>
+          <tbody id="approval-table-body">
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="tab-history" class="tab-pane hidden">
+      <div class="card table-wrapper">
+        <div class="card-header">
+          <h3>Nhật ký đã xử lý</h3>
+          <button class="btn-outline"><i class="fa-solid fa-download"></i> Xuất Excel</button>
+        </div>
+        <table class="data-table">
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Thời gian nộp</th>
+            <th>Nhân viên</th>
+            <th>Công việc</th>
+            <th>Kết quả</th>
+          </tr>
+          </thead>
+          <tbody id="history-table-body">
+          </tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="detail-modal" class="modal-overlay hidden">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h3>Chi tiết báo cáo</h3>
+      <button onclick="closeModal()">✕</button>
     </div>
-  </template>
-</main>
-
-<section id="scr-detail" class="screen hidden detail-view">
-  <div class="image-viewer-container">
-    <img id="detail-image" src="" alt="Evidence Photo">
-
-    <div class="overlay-info">
-      <p>📍 <span id="detail-loc">Khu vực A</span></p>
-      <p>🕒 <span id="detail-time">10:30 20/10/2023</span></p>
+    <div class="modal-body" id="modal-content-body">
     </div>
-
-    <div class="viewer-controls">
-      <button class="ctrl-btn" onclick="transformImage('rotate')">↻ Xoay</button>
-      <button class="ctrl-btn" onclick="transformImage('zoom-in')">+ Zoom</button>
-      <button class="ctrl-btn" onclick="transformImage('zoom-out')">- Zoom</button>
-      <button class="ctrl-btn close-btn" onclick="closeDetail()">✕ Đóng</button>
+    <div class="modal-footer">
+      <button class="btn-danger-light" onclick="handleReject()">Từ chối</button>
+      <button class="btn-primary" onclick="handleApprove()">Chấp thuận</button>
     </div>
   </div>
-
-  <footer class="decision-panel">
-    <div class="employee-summary">
-      <strong id="detail-emp-name">Nguyễn Văn A</strong>
-      <span id="detail-task-name">Vệ sinh kệ hàng</span>
-    </div>
-    <div class="button-group">
-      <button class="btn btn-outline-danger" onclick="openRejectModal()">
-        ✕ Chưa đạt
-      </button>
-      <button class="btn btn-solid-success" onclick="quickApprove(currentReviewId)">
-        ✓ Duyệt ngay
-      </button>
-    </div>
-  </footer>
-</section>
-
-<dialog id="scr-reject-modal" class="modal-dialog">
-  <form method="dialog" id="reject-form">
-    <header class="modal-header">
-      <h3>Xác nhận từ chối</h3>
-    </header>
-    <div class="modal-body">
-                <textarea
-                  id="reject-reason"
-                  placeholder="Ghi chú lý do vì sao chưa đạt (Ví dụ: Ảnh mờ, góc chụp sai...)"
-                  rows="4"
-                  minlength="5"
-                  required></textarea>
-      <p class="error-text hidden" id="modal-error">Vui lòng nhập lý do (tối thiểu 5 ký tự).</p>
-    </div>
-    <footer class="modal-actions">
-      <button type="button" class="btn btn-text" onclick="closeRejectModal()">Hủy bỏ</button>
-      <button type="submit" class="btn btn-solid-danger">Gửi phản hồi</button>
-    </footer>
-  </form>
-</dialog>
+</div>
 
 <script src="js/kiem_duyet.js"></script>
 </body>

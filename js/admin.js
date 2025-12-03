@@ -1,153 +1,197 @@
-// --- MOCK DATA ---
-const areas = [
-  { id: 'A', name: 'Kho A (NV: A)' },
-  { id: 'B', name: 'Kho B (NV: B)' },
-  { id: 'C', name: 'Sảnh (NV: C)' }
+// --- 1. MOCK DATA (Đồng bộ) ---
+// Giả định hôm nay là: 04/12/2025
+const TODAY = "2025-12-04";
+
+const users = [
+  { id: 101, name: "Nguyễn Văn A", dept: "Kho vận", role: "Employee" },
+  { id: 102, name: "Trần Thị B", dept: "Văn phòng", role: "Employee" },
+  { id: 103, name: "Lê Văn C", dept: "Kỹ thuật", role: "Employee" },
+  { id: 104, name: "Phạm D", dept: "Kho vận", role: "Employee" },
+  { id: 105, name: "Vũ E", dept: "Văn phòng", role: "Employee" },
 ];
 
-const steps = [
-  { id: 1, name: '1. Kiểm tra an ninh' },
-  { id: 2, name: '2. Vệ sinh sàn' },
-  { id: 3, name: '3. Kiểm tra PCCC' },
-  { id: 4, name: '4. Tắt thiết bị điện' }
-];
-
-// Data Matrix: Key = StepID_AreaID
-const matrixData = {
-  '1_A': { status: 'approved', emp: 'Nguyễn Văn A', time: '08:00', photos: ['url1', 'url2'] },
-  '1_B': { status: 'approved', emp: 'Trần Văn B', time: '08:15', photos: ['url1'] },
-  '1_C': { status: 'pending', emp: 'Lê Thị C', time: '08:30', photos: [] },
-  '2_A': { status: 'rejected', emp: 'Nguyễn Văn A', time: '09:00', note: 'Sàn chưa khô, còn vết bẩn', photos: ['url3'] },
-  '2_B': { status: 'empty' }, // Not done
-  // ... other mappings
+// Mapping User Name to ID for Syncing with Report Data
+const userMap = {
+  "Nguyễn Văn A": 101,
+  "Trần Thị B": 102,
+  "Lê Văn C": 103,
+  "Phạm D": 104,
+  "Vũ E": 105
 };
 
-// --- DOM ELEMENTS ---
-const matrixTable = document.getElementById('matrix-table');
-const modal = document.getElementById('detail-modal');
-const sidebar = document.getElementById('sidebar');
+// Dữ liệu Reports (Copy y hệt từ kiem_duyet.js để đồng bộ)
+const reports = [
+  { id: 601, emp: "Nguyễn Văn A", dept: "Kho vận", task: "Kiểm đếm hàng", time: "08:15", status: "pending", date: "2025-12-04" },
+  { id: 602, emp: "Trần Thị B", dept: "Văn phòng", task: "Trực lễ tân", time: "08:00", status: "approved", date: "2025-12-04" },
+  { id: 603, emp: "Lê Văn C", dept: "Kỹ thuật", task: "Bảo trì Server", time: "09:30", status: "pending", date: "2025-12-04" },
+  { id: 604, emp: "Phạm D", dept: "Kho vận", task: "Sắp xếp kho", time: "10:00", status: "pending", date: "2025-12-04" },
+  { id: 605, emp: "Vũ E", dept: "Văn phòng", task: "Chuẩn bị họp", time: "08:45", status: "rejected", date: "2025-12-04" },
+  // Các ngày cũ (chỉ cần demo số liệu tổng quan, có thể thêm nếu cần)
+  { id: 501, emp: "Nguyễn Văn A", dept: "Kho vận", time: "16:00", status: "approved", date: "2025-12-03" },
+  { id: 502, emp: "Trần Thị B", dept: "Văn phòng", time: "16:30", status: "approved", date: "2025-12-03" },
+];
 
-// --- 1. RENDER MATRIX ---
-function renderMatrix() {
-  // 1. Render Header Row (Columns = Areas)
-  let thead = `<thead><tr><th style="min-width:150px">Hạng mục</th>`;
-  areas.forEach(area => {
-    thead += `<th style="min-width:120px">${area.name}</th>`;
-  });
-  thead += `</tr></thead>`;
+// --- 2. INIT ---
+document.addEventListener('DOMContentLoaded', () => {
+  // Mặc định chọn ngày hôm nay
+  document.getElementById('global-date').value = TODAY;
+  refreshData();
+});
 
-  // 2. Render Body Rows (Rows = Steps)
-  let tbody = `<tbody>`;
-  steps.forEach(step => {
-    tbody += `<tr>`;
-    tbody += `<th>${step.name}</th>`; // Sticky Left Column
+// --- 3. NAVIGATION ---
+function switchTab(tabId) {
+  document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+  event.currentTarget.classList.add('active');
 
-    areas.forEach(area => {
-      const key = `${step.id}_${area.id}`;
-      const data = matrixData[key] || { status: 'empty' };
-      const statusClass = data.status;
+  const titles = {
+    'dashboard': 'Tổng quan hệ thống',
+    'matrix': 'Theo dõi chi tiết',
+    'users': 'Quản lý nhân sự',
+    'settings': 'Cấu hình'
+  };
+  document.getElementById('page-title').textContent = titles[tabId];
 
-      let cellContent = '';
-      let label = '';
-
-      if (statusClass === 'approved') label = 'Đạt';
-      if (statusClass === 'rejected') label = 'Chưa đạt';
-      if (statusClass === 'pending') label = '(x) Chờ';
-      if (statusClass === 'empty') label = '-';
-
-      tbody += `
-                <td>
-                    <div class="cell-status ${statusClass}"
-                         onclick="openCellDetail('${key}', '${step.name}', '${area.name}')">
-                        ${label}
-                    </div>
-                </td>
-            `;
-    });
-    tbody += `</tr>`;
-  });
-  tbody += `</tbody>`;
-
-  matrixTable.innerHTML = thead + tbody;
+  document.querySelectorAll('.tab-pane').forEach(sec => sec.classList.remove('active'));
+  document.getElementById(`tab-${tabId}`).classList.add('active');
 }
 
-// --- 2. MODAL LOGIC ---
-window.openCellDetail = (key, stepName, areaName) => {
-  const data = matrixData[key];
-  if (!data || data.status === 'empty') return; // Do nothing for empty cells
-
-  // Bind Data
-  document.getElementById('modal-title').textContent = `${stepName} - ${areaName}`;
-  document.getElementById('modal-emp').textContent = data.emp;
-  document.getElementById('modal-time').textContent = data.time;
-
-  // Status Badge Style
-  const badge = document.getElementById('modal-badge');
-  badge.textContent = data.status === 'approved' ? 'Đạt' : (data.status === 'rejected' ? 'Chưa đạt' : 'Chờ duyệt');
-  badge.style.background = data.status === 'approved' ? 'var(--success)' : (data.status === 'rejected' ? 'var(--danger)' : '#999');
-
-  // Notes
-  const noteArea = document.getElementById('modal-note-area');
-  if (data.status === 'rejected' && data.note) {
-    noteArea.classList.remove('hidden');
-    document.getElementById('modal-note-content').textContent = data.note;
-  } else {
-    noteArea.classList.add('hidden');
-  }
-
-  // Mock Gallery
-  const gallery = document.getElementById('modal-gallery');
-  gallery.innerHTML = '';
-  if (data.photos && data.photos.length > 0) {
-    data.photos.forEach(img => {
-      const el = document.createElement('div');
-      el.className = 'gallery-img'; // In real app, put <img> tag here
-      el.style.backgroundColor = '#ddd'; // Placeholder color
-      el.textContent = 'IMG'; // Placeholder text
-      el.style.display = 'flex';
-      el.style.alignItems = 'center';
-      el.style.justifyContent = 'center';
-      gallery.appendChild(el);
-    });
-  } else {
-    gallery.innerHTML = '<p style="grid-column: span 2; text-align:center; color:#999">Chưa có ảnh</p>';
-  }
-
-  modal.showModal();
-};
-
-window.closeModal = () => modal.close();
-
-// --- 3. NAVIGATION & UI ---
-window.navTo = (e, targetId) => {
-  e.preventDefault();
-  // Active Class for Menu
-  document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-  e.currentTarget.classList.add('active');
-
-  // Show Section
-  document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-  document.getElementById(targetId).classList.remove('hidden');
-
-  // Mobile: Close sidebar after click
-  if (window.innerWidth <= 768) toggleSidebar();
-};
-
-window.toggleSidebar = () => {
-  sidebar.classList.toggle('open');
-};
-
-window.exportExcel = () => {
-  alert("Chức năng đang phát triển: Xuất dữ liệu ra file .xlsx");
-};
-
-// --- INIT ---
-document.addEventListener('DOMContentLoaded', () => {
+// --- 4. RENDER LOGIC ---
+function refreshData() {
+  renderDashboard();
   renderMatrix();
-  // Render mock user list (simplified)
-  const userBody = document.getElementById('user-list-body');
-  userBody.innerHTML = `
-        <tr><td>Nguyễn Văn A</td><td>Nhân viên</td><td>Khu A</td><td><button class="btn btn-outline">Sửa</button></td></tr>
-        <tr><td>Trần Văn B</td><td>Quản lý</td><td>Khu B</td><td><button class="btn btn-outline">Sửa</button></td></tr>
-    `;
-});
+  renderUserList();
+}
+
+function renderDashboard() {
+  // Lấy ngày đang chọn để thống kê
+  const selectedDate = document.getElementById('global-date').value;
+
+  // Filter reports theo ngày chọn
+  const dailyReports = reports.filter(r => r.date === selectedDate);
+
+  // Tính toán
+  const totalEmp = users.length;
+
+  // Đếm số người ĐÃ NỘP (dựa trên unique User ID trong reports)
+  const submittedUserIds = new Set(dailyReports.map(r => userMap[r.emp]));
+  const submittedCount = submittedUserIds.size;
+
+  const missingCount = totalEmp - submittedCount;
+  const rate = totalEmp === 0 ? 0 : Math.round((submittedCount / totalEmp) * 100);
+
+  // Update Cards
+  document.getElementById('stat-total-emp').textContent = totalEmp;
+  document.getElementById('stat-submitted').textContent = submittedCount;
+  document.getElementById('stat-missing').textContent = missingCount;
+  document.getElementById('stat-rate').textContent = `${rate}%`;
+
+  // Render Bảng Tiến Độ Bộ Phận
+  const depts = ["Kho vận", "Văn phòng", "Kỹ thuật"];
+  const tbody = document.getElementById('dept-table-body');
+  tbody.innerHTML = '';
+
+  depts.forEach(dept => {
+    const deptUsers = users.filter(u => u.dept === dept);
+    const deptTotal = deptUsers.length;
+
+    // Đếm người đã nộp trong bộ phận này
+    const deptSubmitted = deptUsers.filter(u => submittedUserIds.has(u.id)).length;
+    const deptRate = deptTotal === 0 ? 0 : Math.round((deptSubmitted / deptTotal) * 100);
+
+    let color = '#3b82f6';
+    let status = '<span class="badge badge-warning">Đang nộp</span>';
+    if (deptRate === 100) { color = '#10b981'; status = '<span class="badge badge-success">Hoàn thành</span>'; }
+    else if (deptRate < 50) { color = '#ef4444'; status = '<span class="badge badge-danger">Chậm</span>'; }
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+            <td><strong>${dept}</strong></td>
+            <td class="text-center">${deptTotal}</td>
+            <td class="text-center">${deptSubmitted} / ${deptTotal}</td>
+            <td>
+                <div style="display:flex; align-items:center; gap:8px;">
+                    <div class="progress-bg"><div class="progress-fill" style="width:${deptRate}%; background:${color}"></div></div>
+                    <span style="font-size:12px; width:30px;">${deptRate}%</span>
+                </div>
+            </td>
+            <td class="text-center">${status}</td>
+        `;
+    tbody.appendChild(tr);
+  });
+}
+
+function renderMatrix() {
+  const selectedDate = document.getElementById('global-date').value;
+  const filterDept = document.getElementById('matrix-dept-filter').value;
+  const filterStatus = document.getElementById('matrix-status-filter').value;
+  const tbody = document.getElementById('matrix-table-body');
+  tbody.innerHTML = '';
+
+  // Loop qua TẤT CẢ nhân viên để xem ai thiếu
+  users.forEach(user => {
+    if (filterDept !== 'all' && user.dept !== filterDept) return;
+
+    // Tìm report của user này trong ngày đang chọn
+    const userReport = reports.find(r => r.date === selectedDate && userMap[r.emp] === user.id);
+
+    // Xác định trạng thái
+    let statusKey = 'missing';
+    if (userReport) {
+      // Giả sử nộp sau 09:00 là muộn (logic demo)
+      const cutoffTime = "09:00";
+      statusKey = userReport.time > cutoffTime ? 'late' : 'on_time';
+    }
+
+    if (filterStatus !== 'all' && statusKey !== filterStatus) return;
+
+    let badgeHtml = '';
+    if(statusKey === 'missing') badgeHtml = '<span class="badge badge-danger">🔴 Chưa nộp</span>';
+    else if(statusKey === 'late') badgeHtml = '<span class="badge badge-warning">🟠 Muộn</span>';
+    else badgeHtml = '<span class="badge badge-success">🟢 Đúng giờ</span>';
+
+    const timeText = userReport ? userReport.time : '--:--';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+            <td>
+                <strong>${user.name}</strong><br>
+                <span style="font-size:12px; color:#666">ID: ${user.id}</span>
+            </td>
+            <td>${user.dept}</td>
+            <td>08:00</td>
+            <td>${timeText}</td>
+            <td>${badgeHtml}</td>
+            <td>
+                ${statusKey === 'missing' ? `<button class="btn-sm btn-outline" onclick="alert('Đã gửi nhắc nhở đến ${user.name}')"><i class="fa-solid fa-bell"></i> Nhắc</button>` : '<span style="color:#ccc">-</span>'}
+            </td>
+        `;
+    tbody.appendChild(tr);
+  });
+}
+
+function remindAllMissing() {
+  alert("Hệ thống đang gửi tin nhắn Zalo đến tất cả nhân viên chưa nộp báo cáo...");
+}
+
+function renderUserList() {
+  const tbody = document.getElementById('user-list-body');
+  tbody.innerHTML = '';
+  users.forEach(user => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+            <td>#${user.id}</td>
+            <td><strong>${user.name}</strong></td>
+            <td>${user.dept}</td>
+            <td><span class="badge" style="background:#e2e8f0">${user.role}</span></td>
+            <td>
+                <button class="btn-sm btn-outline"><i class="fa-solid fa-pen"></i></button>
+            </td>
+        `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Modal Functions
+function openUserModal() { document.getElementById('user-modal').classList.remove('hidden'); }
+function closeUserModal() { document.getElementById('user-modal').classList.add('hidden'); }
+function saveUser() { alert("Đã lưu (Demo)"); closeUserModal(); }
